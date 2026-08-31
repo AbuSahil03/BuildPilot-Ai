@@ -1,0 +1,11 @@
+{
+  "name": "buildpilot-ai-workspace",
+  "private": true,
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "dev:web": "pnpm --dir frontend dev",
+    "build:web": "pnpm --dir frontend build",
+    "lint:web": "pnpm --dir frontend lint",
+    "typecheck:web": "pnpm --dir frontend typecheck"
+  }
+}

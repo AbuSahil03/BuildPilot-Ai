@@ -1,0 +1,59 @@
+services:
+  - type: web
+    name: buildpilot-api
+    runtime: python
+    plan: starter
+    region: singapore
+    rootDir: backend
+    buildCommand: pip install .
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: API_V1_PREFIX
+        value: /api/v1
+      - key: APP_NAME
+        value: BuildPilot AI API
+      - key: APP_VERSION
+        value: 0.1.0
+      - key: POSTGRES_DSN
+        fromDatabase:
+          name: buildpilot-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: buildpilot-key-value
+          property: connectionString
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false
+      - key: ALLOWED_CORS_ORIGINS
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-5.6
+      - key: EMBEDDING_MODEL
+        value: text-embedding-3-large
+
+  - type: keyvalue
+    name: buildpilot-key-value
+    plan: starter
+    ipAllowList: []
+    maxmemoryPolicy: allkeys-lru
+    persistenceMode: journal-snapshot
+
+databases:
+  - name: buildpilot-postgres
+    plan: basic-256mb
+    databaseName: buildpilot
+    user: buildpilot
+    postgresMajorVersion: "16"
+
+# Add the Celery background worker in Phase 7 after its executable worker module exists.
